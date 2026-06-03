@@ -1,0 +1,806 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <title>Truy Xuất Nguồn Gốc</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@400;500;600&family=Fira+Code:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      /* ─────────────────────────────────────────
+           DESIGN TOKENS
+        ───────────────────────────────────────── */
+      :root {
+        --bg: #0e0c0b;
+        --surface: #161311;
+        --surface-up: #1e1b18;
+        --surface-high: #262320;
+
+        --border: rgba(255, 255, 255, 0.07);
+        --border-med: rgba(255, 255, 255, 0.11);
+
+        --text: #f0ebe4;
+        --text-muted: #7d7670;
+        --text-dim: #443f3a;
+
+        --green: #22c55e;
+        --green-bg: rgba(34, 197, 94, 0.1);
+        --green-ring: rgba(34, 197, 94, 0.22);
+
+        --blue: #60a5fa;
+        --blue-bg: rgba(96, 165, 250, 0.1);
+
+        --amber: #f59e0b;
+        --amber-bg: rgba(245, 158, 11, 0.1);
+
+        --teal: #2dd4bf;
+        --teal-bg: rgba(45, 212, 191, 0.1);
+
+        --font-display: "Playfair Display", serif;
+        --font-body: "DM Sans", sans-serif;
+        --font-mono: "Fira Code", monospace;
+
+        --radius-sm: 8px;
+        --radius: 14px;
+        --radius-lg: 20px;
+        --radius-full: 999px;
+      }
+
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        font-family: var(--font-body);
+        background: var(--bg);
+        color: var(--text);
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      .mobile-container {
+        width: 100%;
+        max-width: 480px;
+        background: var(--surface);
+        min-height: 100vh;
+        padding-bottom: 52px;
+        position: relative;
+        overflow-x: hidden;
+      }
+
+      /* ─────────────────────────────────────────
+           HERO IMAGE AREA
+        ───────────────────────────────────────── */
+      .hero-wrap {
+        position: relative;
+        width: 100%;
+        height: 260px;
+        overflow: hidden;
+        background: var(--surface-up);
+      }
+
+      .mobile-product-img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+        opacity: 0.9;
+      }
+
+      /* Gradient: image fades into surface below */
+      .hero-fade {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(
+          to bottom,
+          rgba(14, 12, 11, 0) 0%,
+          rgba(14, 12, 11, 0) 40%,
+          rgba(22, 19, 17, 0.7) 75%,
+          rgba(22, 19, 17, 1) 100%
+        );
+        pointer-events: none;
+      }
+
+      /* No-image placeholder */
+      .hero-placeholder {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+      }
+
+      .hero-placeholder .ph-icon {
+        font-size: 52px;
+        opacity: 0.25;
+      }
+
+      .hero-placeholder .ph-label {
+        font-size: 12px;
+        color: var(--text-dim);
+        letter-spacing: 0.5px;
+      }
+
+      /* ─────────────────────────────────────────
+           HEADER / IDENTITY SECTION
+        ───────────────────────────────────────── */
+      .header-section {
+        padding: 0 20px 26px;
+        border-bottom: 1px solid var(--border);
+      }
+
+      /* Verified badge — sits at transition of image/content */
+      .badge-verified {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        background: var(--green-bg);
+        color: var(--green);
+        padding: 6px 14px;
+        border-radius: var(--radius-full);
+        font-size: 12px;
+        font-weight: 600;
+        border: 1px solid var(--green-ring);
+        margin-bottom: 16px;
+      }
+
+      .badge-pulse {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: var(--green);
+        animation: pulse 2.4s ease-in-out infinite;
+        flex-shrink: 0;
+      }
+
+      @keyframes pulse {
+        0%,
+        100% {
+          box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.2);
+        }
+        50% {
+          box-shadow: 0 0 0 5px rgba(34, 197, 94, 0.06);
+        }
+      }
+
+      .product-title {
+        font-family: var(--font-display);
+        font-size: 22px;
+        font-weight: 700;
+        color: var(--text);
+        margin-bottom: 5px;
+        line-height: 1.25;
+      }
+
+      .product-subtitle {
+        font-size: 13.5px;
+        color: var(--text-muted);
+        margin-bottom: 18px;
+        line-height: 1.45;
+      }
+
+      /* Certificate-style hash display */
+      .cert-block {
+        display: flex;
+        align-items: stretch;
+        border: 1px solid var(--border-med);
+        border-radius: var(--radius-sm);
+        overflow: hidden;
+      }
+
+      .cert-label {
+        padding: 9px 12px;
+        background: var(--surface-high);
+        font-family: var(--font-mono);
+        font-size: 9px;
+        font-weight: 500;
+        color: var(--text-dim);
+        letter-spacing: 1.2px;
+        text-transform: uppercase;
+        border-right: 1px solid var(--border-med);
+        display: flex;
+        align-items: center;
+        white-space: nowrap;
+        flex-shrink: 0;
+      }
+
+      .cert-value {
+        padding: 9px 12px;
+        font-family: var(--font-mono);
+        font-size: 11px;
+        color: var(--text-muted);
+        word-break: break-all;
+        line-height: 1.5;
+      }
+
+      /* ─────────────────────────────────────────
+           PROGRESS INDICATOR
+        ───────────────────────────────────────── */
+      .progress-section {
+        padding: 20px 20px 0;
+      }
+
+      .progress-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 9px;
+      }
+
+      .progress-label {
+        font-size: 10.5px;
+        font-weight: 600;
+        color: var(--text-dim);
+        text-transform: uppercase;
+        letter-spacing: 1.2px;
+      }
+
+      .progress-counter {
+        font-family: var(--font-mono);
+        font-size: 10.5px;
+        color: var(--text-muted);
+      }
+
+      .progress-track {
+        height: 3px;
+        background: var(--surface-high);
+        border-radius: var(--radius-full);
+        overflow: hidden;
+      }
+
+      .progress-fill {
+        height: 100%;
+        border-radius: var(--radius-full);
+        background: linear-gradient(90deg, var(--green), var(--teal));
+        transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+      /* ─────────────────────────────────────────
+           TIMELINE
+        ───────────────────────────────────────── */
+      .timeline-section {
+        padding: 26px 20px;
+      }
+
+      .timeline-title {
+        font-size: 10.5px;
+        font-weight: 600;
+        color: var(--text-dim);
+        letter-spacing: 1.6px;
+        text-transform: uppercase;
+        margin-bottom: 24px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .timeline-title::after {
+        content: "";
+        flex: 1;
+        height: 1px;
+        background: var(--border);
+      }
+
+      /* FLEX-BASED TIMELINE — no absolute positioning */
+      .node {
+        display: flex;
+        gap: 14px;
+        animation: nodeFadeIn 0.38s ease both;
+      }
+
+      .node:nth-child(1) {
+        animation-delay: 0.08s;
+      }
+      .node:nth-child(2) {
+        animation-delay: 0.18s;
+      }
+      .node:nth-child(3) {
+        animation-delay: 0.28s;
+      }
+      .node:nth-child(4) {
+        animation-delay: 0.38s;
+      }
+
+      @keyframes nodeFadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      /* Left column: icon + connector */
+      .node-left {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        flex-shrink: 0;
+        width: 40px;
+      }
+
+      .node-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 17px;
+        flex-shrink: 0;
+        position: relative;
+        z-index: 1;
+        transition: box-shadow 0.3s;
+      }
+
+      /* Completed icon styles */
+      .icon-farm {
+        background: var(--green-bg);
+        box-shadow: 0 0 0 1px var(--green-ring);
+      }
+      .icon-proc {
+        background: var(--blue-bg);
+        box-shadow: 0 0 0 1px rgba(96, 165, 250, 0.2);
+      }
+      .icon-log {
+        background: var(--amber-bg);
+        box-shadow: 0 0 0 1px rgba(245, 158, 11, 0.2);
+      }
+      .icon-ret {
+        background: var(--teal-bg);
+        box-shadow: 0 0 0 1px rgba(45, 212, 191, 0.2);
+      }
+      /* Pending icon style */
+      .icon-pending {
+        background: var(--surface-up);
+        border: 1.5px dashed var(--border-med);
+        font-size: 15px;
+        opacity: 0.5;
+      }
+
+      /* Vertical connector line */
+      .node-connector {
+        width: 1.5px;
+        flex: 1;
+        min-height: 14px;
+        background: var(--border);
+        border-radius: 1px;
+        margin: 5px 0;
+      }
+
+      .node-connector.done {
+        background: linear-gradient(
+          to bottom,
+          rgba(34, 197, 94, 0.35),
+          rgba(255, 255, 255, 0.05)
+        );
+      }
+
+      .node:last-child .node-connector {
+        display: none;
+      }
+
+      /* Right column: content */
+      .node-right {
+        flex: 1;
+        padding-bottom: 22px;
+        min-width: 0;
+      }
+
+      .node-title {
+        font-family: var(--font-display);
+        font-size: 15px;
+        font-weight: 600;
+        color: var(--text);
+        margin: 3px 0 5px;
+        line-height: 1.25;
+      }
+
+      .node-title.is-pending {
+        color: var(--text-dim);
+        font-weight: 600;
+      }
+
+      .node-desc {
+        font-size: 12.5px;
+        color: var(--text-muted);
+        margin-bottom: 4px;
+        line-height: 1.5;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .node-time {
+        font-family: var(--font-mono);
+        font-size: 10px;
+        color: var(--text-dim);
+        margin-bottom: 8px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      /* Status badges */
+      .status-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 3px 9px;
+        border-radius: 4px;
+        font-size: 11px;
+        font-weight: 600;
+        line-height: 1.5;
+      }
+
+      .badge-green {
+        background: var(--green-bg);
+        color: var(--green);
+      }
+      .badge-blue {
+        background: var(--blue-bg);
+        color: var(--blue);
+      }
+      .badge-orange {
+        background: var(--amber-bg);
+        color: var(--amber);
+      }
+      .badge-teal {
+        background: var(--teal-bg);
+        color: var(--teal);
+      }
+
+      /* Pending placeholder text */
+      .node-pending-msg {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        font-size: 12px;
+        color: var(--text-dim);
+        font-style: italic;
+        margin-top: 3px;
+      }
+
+      .pending-tick {
+        width: 12px;
+        height: 1px;
+        background: var(--border-med);
+        border-radius: 1px;
+        flex-shrink: 0;
+      }
+
+      /* ─────────────────────────────────────────
+           FOOTER SHARE BUTTON
+        ───────────────────────────────────────── */
+      .footer-action {
+        text-align: center;
+        border-top: 1px solid var(--border);
+        padding: 24px 20px 0;
+      }
+
+      .share-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 11px 24px;
+        border: 1px solid var(--border-med);
+        border-radius: var(--radius-full);
+        background: var(--surface-up);
+        color: var(--text-muted);
+        text-decoration: none;
+        font-size: 13.5px;
+        font-weight: 500;
+        transition:
+          border-color 0.2s,
+          color 0.2s,
+          background 0.2s;
+        -webkit-tap-highlight-color: transparent;
+      }
+
+      .share-btn:active {
+        background: var(--surface-high);
+        color: var(--text);
+      }
+
+      /* ─────────────────────────────────────────
+           LOADING & ERROR STATES
+        ───────────────────────────────────────── */
+      #loadingMsg {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        padding: 30px 24px;
+        gap: 14px;
+        text-align: center;
+      }
+
+      .spinner {
+        display: block;
+        width: 32px;
+        height: 32px;
+        border: 2.5px solid rgba(255, 255, 255, 0.07);
+        border-radius: 50%;
+        border-top-color: var(--green);
+        animation: spin 0.75s linear infinite;
+        margin-bottom: 2px;
+      }
+
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      .loading-text {
+        font-size: 14px;
+        color: var(--text-muted);
+        line-height: 1.5;
+      }
+
+      .loading-sub {
+        font-family: var(--font-mono);
+        font-size: 10.5px;
+        color: var(--text-dim);
+        animation: blink 1.8s ease-in-out infinite;
+      }
+
+      @keyframes blink {
+        0%,
+        100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.35;
+        }
+      }
+
+      .error-icon {
+        font-size: 38px;
+        margin-bottom: 4px;
+      }
+
+      .error-text {
+        font-size: 14px;
+        color: #f87171;
+        font-weight: 500;
+        line-height: 1.5;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="mobile-container" id="app">
+      <div id="loadingMsg">
+        <div class="spinner"></div>
+        <p class="loading-text">
+          Đang truy xuất dữ liệu<br />từ sổ cái Blockchain
+        </p>
+        <p class="loading-sub">connecting to ledger...</p>
+      </div>
+
+      <div id="content" style="display: none"></div>
+    </div>
+
+    <script>
+      window.addEventListener("load", async () => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const batchID = urlParams.get("id");
+        const appContent = document.getElementById("content");
+        const loadingMsg = document.getElementById("loadingMsg");
+
+        if (!batchID) {
+          loadingMsg.innerHTML = `
+                    <div class="error-icon">⚠️</div>
+                    <p class="error-text">Mã QR không hợp lệ<br>hoặc bị hỏng!</p>`;
+          return;
+        }
+
+        try {
+          // Gọi API bằng đường dẫn tương đối
+          const apiUrl = "/api/product/" + batchID;
+          const res = await fetch(apiUrl);
+          const data = await res.json();
+
+          if (!res.ok) throw new Error(data.error);
+
+          loadingMsg.style.display = "none";
+          appContent.style.display = "block";
+
+          // ── Tính số bước đã hoàn thành (cho progress bar)
+          const completedCount =
+            1 +
+            (data.processingData ? 1 : 0) +
+            (data.logisticsData ? 1 : 0) +
+            (data.retailerData ? 1 : 0);
+          const progressPct = (completedCount / 4) * 100;
+
+          // ── Render hero image hoặc placeholder
+          const heroHtml = data.farmData?.ImageURL
+            ? `<img src="${data.farmData.ImageURL}" class="mobile-product-img" alt="Ảnh sản phẩm">
+                       <div class="hero-fade"></div>`
+            : `<div class="hero-placeholder">
+                           <span class="ph-icon">📦</span>
+                           <span class="ph-label">Hình ảnh chưa cập nhật</span>
+                       </div>`;
+
+          // ── Render hash rút gọn
+          const hashShort = data.dataHash
+            ? data.dataHash.substring(0, 12) +
+              "···" +
+              data.dataHash.substring(data.dataHash.length - 6)
+            : "---";
+
+          // ── Render nội dung chính
+          appContent.innerHTML = `
+
+                    <!-- HERO -->
+                    <div class="hero-wrap">${heroHtml}</div>
+
+                    <!-- HEADER / IDENTITY -->
+                    <div class="header-section">
+                        <div class="badge-verified">
+                            <span class="badge-pulse"></span>
+                            Đã xác thực trên Blockchain
+                        </div>
+                        <h1 class="product-title">
+                            ${data.farmData?.ProductName || "Sản Phẩm"} — ${batchID}
+                        </h1>
+                        <p class="product-subtitle">
+                            ${data.farmData?.FarmName || "N/A"} &nbsp;·&nbsp; ${data.farmData?.Location || "N/A"}
+                        </p>
+                        <div class="cert-block">
+                            <span class="cert-label">SHA-256</span>
+                            <span class="cert-value">${hashShort}</span>
+                        </div>
+                    </div>
+
+                    <!-- PROGRESS -->
+                    <div class="progress-section">
+                        <div class="progress-header">
+                            <span class="progress-label">Tiến độ chuỗi cung ứng</span>
+                            <span class="progress-counter">${completedCount} / 4 bước</span>
+                        </div>
+                        <div class="progress-track">
+                            <div class="progress-fill" style="width: ${progressPct}%;"></div>
+                        </div>
+                    </div>
+
+                    <!-- TIMELINE -->
+                    <div class="timeline-section">
+                        <div class="timeline-title">Hành Trình Sản Phẩm</div>
+
+                        <!-- FARM NODE -->
+                        <div class="node">
+                            <div class="node-left">
+                                <div class="node-icon icon-farm">🌿</div>
+                                <div class="node-connector done"></div>
+                            </div>
+                            <div class="node-right">
+                                <h3 class="node-title">Thu hoạch tại trang trại</h3>
+                                <p class="node-desc">${data.farmData?.FarmName} — ${data.farmData?.Location}</p>
+                                <div class="node-time">${data.farmData?.Date}</div>
+                                <span class="status-badge badge-green">Đã chứng nhận xuất xứ</span>
+                            </div>
+                        </div>
+
+                        <!-- PROCESSOR NODE -->
+                        <div class="node">
+                            <div class="node-left">
+                                <div class="node-icon ${data.processingData ? "icon-proc" : "icon-pending"}">🏭</div>
+                                <div class="node-connector ${data.processingData ? "done" : ""}"></div>
+                            </div>
+                            <div class="node-right">
+                                <h3 class="node-title ${data.processingData ? "" : "is-pending"}">Xử lý &amp; kiểm định</h3>
+                                ${
+                                  data.processingData
+                                    ? `
+                                    <p class="node-desc">${data.processingData.ProcessorName}</p>
+                                    <div class="node-time">
+                                        ${data.processingData.Date}
+                                        <span style="color:var(--text-dim)">·</span>
+                                        ${data.processingData.Method}
+                                    </div>
+                                    <span class="status-badge badge-blue">Kiểm tra chất lượng: Đạt</span>
+                                `
+                                    : `
+                                    <div class="node-pending-msg">
+                                        <span class="pending-tick"></span>
+                                        Đang chờ tiếp nhận tại nhà máy
+                                    </div>`
+                                }
+                            </div>
+                        </div>
+
+                        <!-- LOGISTICS NODE -->
+                        <div class="node">
+                            <div class="node-left">
+                                <div class="node-icon ${data.logisticsData ? "icon-log" : "icon-pending"}">🚚</div>
+                                <div class="node-connector ${data.logisticsData ? "done" : ""}"></div>
+                            </div>
+                            <div class="node-right">
+                                <h3 class="node-title ${data.logisticsData ? "" : "is-pending"}">Vận chuyển lạnh</h3>
+                                ${
+                                  data.logisticsData
+                                    ? `
+                                    <p class="node-desc">${data.logisticsData.Company}</p>
+                                    <div class="node-time">
+                                        ${data.logisticsData.Date}
+                                        <span style="color:var(--text-dim)">·</span>
+                                        Xe ${data.logisticsData.VehicleID}
+                                    </div>
+                                    <span class="status-badge badge-orange">Nhiệt độ: ${data.logisticsData.Temp} ✓</span>
+                                `
+                                    : `
+                                    <div class="node-pending-msg">
+                                        <span class="pending-tick"></span>
+                                        Đang chờ điều phối xe vận chuyển
+                                    </div>`
+                                }
+                            </div>
+                        </div>
+
+                        <!-- RETAILER NODE -->
+                        <div class="node">
+                            <div class="node-left">
+                                <div class="node-icon ${data.retailerData ? "icon-ret" : "icon-pending"}">🛒</div>
+                                <div class="node-connector"></div>
+                            </div>
+                            <div class="node-right">
+                                <h3 class="node-title ${data.retailerData ? "" : "is-pending"}">Tại siêu thị</h3>
+                                ${
+                                  data.retailerData
+                                    ? `
+                                    <p class="node-desc">${data.retailerData.RetailerName} — ${data.retailerData.Location}</p>
+                                    <div class="node-time">${data.retailerData.ReceivedDate}</div>
+                                    <span class="status-badge badge-teal">Sẵn sàng tiêu thụ</span>
+                                `
+                                    : `
+                                    <div class="node-pending-msg">
+                                        <span class="pending-tick"></span>
+                                        Đang chờ nhập kho siêu thị
+                                    </div>`
+                                }
+                            </div>
+                        </div>
+
+                        <!-- SHARE FOOTER -->
+                        <div class="footer-action">
+                            <a href="#" class="share-btn" onclick="alert('Đã sao chép liên kết xác minh!');">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="2"
+                                    stroke-linecap="round" stroke-linejoin="round">
+                                    <circle cx="18" cy="5" r="3"/>
+                                    <circle cx="6" cy="12" r="3"/>
+                                    <circle cx="18" cy="19" r="3"/>
+                                    <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/>
+                                    <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+                                </svg>
+                                Chia sẻ xác minh này
+                            </a>
+                        </div>
+                    </div>
+                `;
+        } catch (e) {
+          loadingMsg.innerHTML = `
+                    <div class="error-icon">🔍</div>
+                    <p class="error-text">Không tìm thấy thông tin<br>lô hàng này trên Blockchain!</p>`;
+        }
+      });
+    </script>
+  </body>
+</html>

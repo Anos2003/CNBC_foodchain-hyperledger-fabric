@@ -1,0 +1,499 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FoodChain — Hệ Thống Truy Xuất Nguồn Gốc</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600&family=Fira+Code:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+
+    <link rel="stylesheet" href="style.css" />
+
+    <script src="https://unpkg.com/html5-qrcode"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  </head>
+  <body>
+    <div class="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-logo">
+          <div class="logo-mark">🔗</div>
+          <div class="logo-text">
+            <h3>FoodChain</h3>
+            <small>Blockchain Traceability</small>
+          </div>
+        </div>
+      </div>
+
+      <div class="nav-section">
+        <div class="nav-label">Chuỗi Cung Ứng</div>
+        <div
+          id="mnav-farm"
+          class="menu-item active"
+          onclick="switchTab('farm', this)"
+        >
+          <span class="item-icon">🌾</span
+          ><span class="item-label">Nông Trại Sản Xuất</span
+          ><span class="step-badge">01</span>
+        </div>
+        <div
+          id="mnav-processor"
+          class="menu-item"
+          onclick="switchTab('processor', this)"
+        >
+          <span class="item-icon">🏭</span
+          ><span class="item-label">Nhà Máy Chế Biến</span
+          ><span class="step-badge">02</span>
+        </div>
+        <div
+          id="mnav-logistics"
+          class="menu-item"
+          onclick="switchTab('logistics', this)"
+        >
+          <span class="item-icon">🚚</span
+          ><span class="item-label">Vận Chuyển</span
+          ><span class="step-badge">03</span>
+        </div>
+        <div
+          id="mnav-retailer"
+          class="menu-item"
+          onclick="switchTab('retailer', this)"
+        >
+          <span class="item-icon">🛒</span
+          ><span class="item-label">Siêu Thị Phân Phối</span
+          ><span class="step-badge">04</span>
+        </div>
+
+        <div class="chain-flow chain-flow--spaced">
+          <div class="chain-node farm-node"></div>
+          <div class="chain-line"></div>
+          <div class="chain-node proc-node"></div>
+          <div class="chain-line"></div>
+          <div class="chain-node log-node"></div>
+          <div class="chain-line"></div>
+          <div class="chain-node ret-node"></div>
+        </div>
+      </div>
+
+      <div class="nav-section">
+        <div class="nav-label">Quản Lý Dữ Liệu</div>
+        <div
+          id="mnav-store"
+          class="menu-item"
+          onclick="switchTab('store', this)"
+        >
+          <span class="item-icon">📦</span
+          ><span class="item-label">Kho Sản Phẩm (Blockchain)</span>
+        </div>
+      </div>
+
+      <div class="nav-section">
+        <div class="nav-label">Người Tiêu Dùng</div>
+        <div
+          id="mnav-customer"
+          class="menu-item"
+          onclick="switchTab('customer', this)"
+        >
+          <span class="item-icon">🔍</span
+          ><span class="item-label">Quét Mã Truy Xuất</span>
+        </div>
+      </div>
+
+      <div class="sidebar-footer"><p>v1.0 • Hyperledger Fabric</p></div>
+    </div>
+
+    <div class="content">
+      <div id="farm" class="tab-pane active dashboard-layout">
+        <div class="dashboard-wrapper">
+          <div class="form-card">
+            <div class="card-accent farm"></div>
+            <div class="card-header">
+              <div class="role-chip farm">
+                🌾 Bước 01 &nbsp;·&nbsp; Nông Trại
+              </div>
+              <h2>Khởi Tạo Lô Hàng Mới</h2>
+              <p>
+                Ghi nhận thông tin gốc lên Blockchain — tạo dấu vân tay kỹ thuật
+                số không thể sửa đổi
+              </p>
+            </div>
+            <div class="card-body">
+              <div class="form-grid">
+                <div class="form-group full-width">
+                  <label>Mã Lô Hàng (In trên tem QR)</label>
+                  <input
+                    type="text"
+                    id="farm_batchID"
+                    placeholder="VD: LOHANG_001"
+                  />
+                </div>
+                <div class="form-group full-width">
+                  <label>Tên Sản Phẩm</label>
+                  <input
+                    type="text"
+                    id="farm_productName"
+                    placeholder="VD: Dưa lưới công nghệ cao"
+                  />
+                </div>
+                <div class="form-group">
+                  <label>Cơ Sở Nuôi Trồng</label>
+                  <input
+                    type="text"
+                    id="farm_name"
+                    placeholder="VD: Nông trại Xanh"
+                  />
+                </div>
+                <div class="form-group">
+                  <label>Vị Trí / Vùng Trồng</label>
+                  <input
+                    type="text"
+                    id="farm_location"
+                    placeholder="VD: Đà Lạt, Lâm Đồng"
+                  />
+                </div>
+                <div class="form-group">
+                  <label>Ngày Thu Hoạch</label>
+                  <input type="date" id="farm_date" />
+                </div>
+                <div class="form-group full-width">
+                  <label>Link Ảnh Sản Phẩm (Tùy chọn)</label>
+                  <input
+                    type="text"
+                    id="farm_image"
+                    placeholder="VD: https://domain.com/anh.jpg"
+                  />
+                </div>
+              </div>
+              <button class="btn-farm" onclick="submitFarm()">
+                ✦&nbsp; Lưu Vào Sổ Cái (Khởi Tạo)
+              </button>
+              <div id="msg_farm" class="msg"></div>
+            </div>
+          </div>
+
+          <div class="info-panel">
+            <h3><span style="color: var(--farm)">📡</span> Trạng Thái Node</h3>
+            <div class="info-item">
+              <strong>Node Hoạt Động</strong>
+              Peer0.Farm đang duy trì kết nối mạng lưới
+            </div>
+            <div class="info-item">
+              <strong>Đồng Thuận (Endorsement)</strong>
+              Xác thực Smart Contract chờ phản hồi
+            </div>
+            <div class="info-item">
+              <strong>Chuẩn Bảo Mật</strong>
+              Chữ ký số x509 & Thuật toán SHA-256
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="processor" class="tab-pane dashboard-layout">
+        <div class="dashboard-wrapper">
+          <div class="form-card">
+            <div class="card-accent proc"></div>
+            <div class="card-header">
+              <div class="role-chip proc">
+                🏭 Bước 02 &nbsp;·&nbsp; Chế Biến
+              </div>
+              <h2>Cập Nhật Chế Biến</h2>
+              <p>Xác nhận quy cách đóng gói và tiêu chuẩn xử lý thực phẩm</p>
+            </div>
+            <div class="card-body">
+              <div class="form-grid">
+                <div class="form-group full-width">
+                  <label>Mã Lô Hàng</label>
+                  <input
+                    type="text"
+                    id="proc_batchID"
+                    placeholder="Nhập mã lô hàng nhận được..."
+                  />
+                </div>
+                <div class="form-group">
+                  <label>Tên Nhà Máy</label>
+                  <input
+                    type="text"
+                    id="proc_name"
+                    placeholder="VD: Nhà máy sơ chế ABC"
+                  />
+                </div>
+                <div class="form-group">
+                  <label>Phương Pháp / Quy Cách</label>
+                  <input
+                    type="text"
+                    id="proc_method"
+                    placeholder="VD: Rửa sục ozone, Đóng hộp chân không"
+                  />
+                </div>
+                <div class="form-group full-width">
+                  <label>Ngày Đóng Gói</label>
+                  <input type="date" id="proc_date" />
+                </div>
+              </div>
+              <button class="btn-proc" onclick="submitProcessor()">
+                ✦&nbsp; Ký Xác Nhận Chế Biến
+              </button>
+              <div id="msg_processor" class="msg"></div>
+            </div>
+          </div>
+
+          <div class="info-panel">
+            <h3><span style="color: var(--proc)">⚙️</span> Trạng Thái Node</h3>
+            <div class="info-item">
+              <strong>Node Hoạt Động</strong>
+              Peer0.Processor đang xử lý truy vấn
+            </div>
+            <div class="info-item">
+              <strong>Cập Nhật Trạng Thái</strong>
+              UpdateState() chuẩn bị ghi đè lên sổ cái
+            </div>
+            <div class="info-item">
+              <strong>Đồng Bộ Hóa</strong>
+              Kiểm tra tính toàn vẹn với chuỗi trước đó
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="logistics" class="tab-pane dashboard-layout">
+        <div class="dashboard-wrapper">
+          <div class="form-card">
+            <div class="card-accent log"></div>
+            <div class="card-header">
+              <div class="role-chip log">
+                🚚 Bước 03 &nbsp;·&nbsp; Vận Chuyển
+              </div>
+              <h2>Điều Phối Vận Chuyển</h2>
+              <p>
+                Ghi nhận thông tin logistics và điều kiện bảo quản môi trường
+              </p>
+            </div>
+            <div class="card-body">
+              <div class="form-grid">
+                <div class="form-group full-width">
+                  <label>Mã Lô Hàng</label>
+                  <input
+                    type="text"
+                    id="log_batchID"
+                    placeholder="Nhập mã lô hàng vận chuyển..."
+                  />
+                </div>
+                <div class="form-group">
+                  <label>Đơn Vị Vận Tải</label>
+                  <input
+                    type="text"
+                    id="log_company"
+                    placeholder="VD: Viettel Post, Giao Hàng Tiết Kiệm"
+                  />
+                </div>
+                <div class="form-group">
+                  <label>Biển Số Xe</label>
+                  <input
+                    type="text"
+                    id="log_vehicle"
+                    placeholder="VD: 29H-123.45"
+                  />
+                </div>
+                <div class="form-group">
+                  <label>Điều Kiện Bảo Quản</label>
+                  <div class="input-with-unit">
+                    <input
+                      type="number"
+                      id="log_temp"
+                      placeholder="VD: 4"
+                    />
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label>Ngày Xuất Phát</label>
+                  <input type="date" id="log_date" />
+                </div>
+              </div>
+              <button class="btn-log" onclick="submitLogistics()">
+                ✦&nbsp; Ký Xác Nhận Vận Chuyển
+              </button>
+              <div id="msg_logistics" class="msg"></div>
+            </div>
+          </div>
+
+          <div class="info-panel">
+            <h3><span style="color: var(--log)">🌐</span> Trạng Thái Node</h3>
+            <div class="info-item">
+              <strong>Node Hoạt Động</strong>
+              Peer0.Logistics kết nối an toàn
+            </div>
+            <div class="info-item">
+              <strong>Tích Hợp Dữ Liệu</strong>
+              Cập nhật tham số môi trường vận chuyển
+            </div>
+            <div class="info-item">
+              <strong>Lịch Sử Giao Dịch</strong>
+              Băm (Hash) dữ liệu thêm vào block mới
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="retailer" class="tab-pane dashboard-layout">
+        <div class="dashboard-wrapper">
+          <div class="form-card">
+            <div class="card-accent ret"></div>
+            <div class="card-header">
+              <div class="role-chip ret">🛒 Bước 04 &nbsp;·&nbsp; Siêu Thị</div>
+              <h2>Xác Nhận Lên Kệ</h2>
+              <p>
+                Điểm cuối chuỗi cung ứng — xác nhận hàng đã nhập kho và lên kệ
+                bán
+              </p>
+            </div>
+            <div class="card-body">
+              <div class="form-grid">
+                <div class="form-group full-width">
+                  <label>Mã Lô Hàng</label>
+                  <input
+                    type="text"
+                    id="ret_batchID"
+                    placeholder="Nhập mã lô hàng nhập kho..."
+                  />
+                </div>
+                <div class="form-group">
+                  <label>Hệ Thống Siêu Thị</label>
+                  <input
+                    type="text"
+                    id="ret_name"
+                    placeholder="VD: WinMart, Bách Hóa Xanh"
+                  />
+                </div>
+                <div class="form-group">
+                  <label>Chi Nhánh Bán Cụ Thể</label>
+                  <input
+                    type="text"
+                    id="ret_location"
+                    placeholder="VD: 123 Cầu Giấy, Hà Nội"
+                  />
+                </div>
+                <div class="form-group full-width">
+                  <label>Ngày Lên Kệ</label>
+                  <input type="date" id="ret_date" />
+                </div>
+              </div>
+              <button class="btn-ret" onclick="submitRetailer()">
+                ✦&nbsp; Xác Nhận Đã Nhận Hàng
+              </button>
+              <div id="msg_retailer" class="msg"></div>
+            </div>
+          </div>
+
+          <div class="info-panel">
+            <h3>
+              <span style="color: var(--ret)">📦</span> Trạng Thái Hệ Thống
+            </h3>
+            <div class="info-item">
+              <strong>Blockchain Network</strong>
+              Hyperledger Fabric đang hoạt động ổn định
+            </div>
+            <div class="info-item">
+              <strong>Bảo Mật Dữ Liệu</strong>
+              Giao dịch được ký và lưu vĩnh viễn
+            </div>
+            <div class="info-item">
+              <strong>Retail Verification</strong>
+              Xác nhận nguồn gốc tại điểm bán
+            </div>
+            <div class="info-item">
+              <strong>Realtime Sync</strong>
+              Đồng bộ dữ liệu tức thời từ Ledger
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="store" class="tab-pane" style="max-width: 1080px; width: 100%">
+        <div class="form-card">
+          <div class="card-accent cust"></div>
+          <div class="card-header">
+            <div class="role-chip cust">📦 Kho Dữ Liệu</div>
+            <h2>Sản Phẩm Đã Khởi Tạo</h2>
+            <p>
+              Đồng bộ thời gian thực từ sổ cái Blockchain. Bấm nút hiển thị mã
+              QR để thiết bị Mobile quét kiểm tra.
+            </p>
+          </div>
+          <div class="card-body">
+            <div class="stats-grid">
+              <div class="stat-card s-total">
+                <span class="stat-title">📦 Tổng Lô Hàng</span>
+                <span class="stat-value" id="stat_total">0</span>
+              </div>
+              <div class="stat-card s-proc">
+                <span class="stat-title">🏭 Đang Chế Biến</span>
+                <span class="stat-value" id="stat_proc">0</span>
+              </div>
+              <div class="stat-card s-log">
+                <span class="stat-title">🚚 Đang Vận Chuyển</span>
+                <span class="stat-value" id="stat_log">0</span>
+              </div>
+              <div class="stat-card s-ret">
+                <span class="stat-title">🛒 Đã Lên Kệ</span>
+                <span class="stat-value" id="stat_ret">0</span>
+              </div>
+            </div>
+            <div class="product-grid" id="productList"></div>
+          </div>
+        </div>
+      </div>
+
+      <div
+        id="customer"
+        class="tab-pane"
+        style="max-width: 700px; margin: 0 auto"
+      >
+        <div class="form-card">
+          <div class="card-accent cust"></div>
+          <div class="card-header" style="text-align: center">
+            <div class="role-chip cust">🔍 Người Tiêu Dùng</div>
+            <h2>Cổng Truy Xuất Nguồn Gốc</h2>
+            <p>Minh bạch thông tin — An tâm tiêu dùng</p>
+          </div>
+          <div class="card-body">
+            <div id="reader"></div>
+
+            <div class="search-box">
+              <input
+                type="text"
+                id="maLoHang"
+                placeholder="Nhập mã in trên bao bì..."
+                style="text-align: center; font-weight: 600"
+              />
+              <button
+                class="btn-search"
+                onclick="fetchData(document.getElementById('maLoHang').value)"
+              >
+                Tra Cứu
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="results-wrapper">
+          <h3 id="tenSanPham" class="product-title"></h3>
+          <div id="timeline" class="tracking-list"></div>
+        </div>
+      </div>
+    </div>
+
+    <div id="qrModal" class="qr-modal">
+      <div class="qr-modal-card">
+        <h3 id="modalTitle">Mã Truy Xuất</h3>
+        <div id="modalQRCode"></div>
+        <button class="btn-close-modal" onclick="closeModal()">Đóng Lại</button>
+      </div>
+      <p class="qr-helper-text">
+        Dùng thiết bị di động quét mã này để hiển thị giao diện UI Mobile
+      </p>
+    </div>
+
+    <script src="app.js"></script>
+  </body>
+</html>
