@@ -153,7 +153,7 @@ Dự án được phát triển trong khuôn khổ môn học Công nghệ Block
 
 - Trịnh Hữu Hiệu ([Anos2003](https://github.com/Anos2003))
 
-Giảng viên hướng dẫn: TS. Trần Đăng Công - Khoa Công nghệ Thông tin - Đại học Đại Nam
+- Giảng viên hướng dẫn: TS. Trần Đăng Công - Khoa Công nghệ Thông tin - Đại học Đại Nam
 ---
 ## 11. Giấy phép
 
