@@ -47,7 +47,6 @@ Dự án này ra đời nhằm giải quyết triệt để bài toán đó. B�
 
 ## 3. Demo
 
-*Video demo: [Đang cập nhật - Chèn link YouTube/Drive của bro vào đây]*
 *Link hệ thống (Ngrok): [Đang cập nhật]*
 
 ---
