@@ -52,14 +52,18 @@ Dưới đây là các hình ảnh thực tế từ giao diện quản trị (En
 ### 💻 Giao diện Quản trị (Web Dashboard)
 *Bảng thống kê trạng thái thời gian thực và Form nhập liệu được thiết kế theo chuẩn Enterprise.*
 
-![Web Dashboard](https://github.com/user-attachments/assets/5433fe3a-7b61-4315-b28a-f8daca87e6ab)
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/5433fe3a-7b61-4315-b28a-f8daca87e6ab" width="200" />
+</p>
 
----
+<br>
 
 ### 📱 Cổng Truy Xuất Nguồn Gốc (Mobile Portal)
 *Giao diện quét mã QR không cần cài App và Timeline hành trình sản phẩm trên thiết bị di động.*
 
-![Mobile Portal](https://github.com/user-attachments/assets/8597551a-1dfb-47d5-b282-40295ebbe37d)
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/8597551a-1dfb-47d5-b282-40295ebbe37d" width="150" />
+</p>
 ---
 
 ## 4. Tính năng cốt lõi
